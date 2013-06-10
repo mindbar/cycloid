@@ -25,7 +25,7 @@ public class CycloidConnectActivity extends Activity {
     // SPP UUID service
     private static final UUID MY_UUID = UUID.fromString("00001101-0000-1000-8000-00805F9B34FB");
     // MAC-address of Arduino Bluetooth module
-    private static String address = "7C:61:93:D4:3F:C5";
+    private static String address = "20:13:02:25:10:89";
     final int RECIEVE_MESSAGE = 1;        // Статус для Handler
     TextView lblSpeed, lblCadence, lblStatus;
     Handler h;
@@ -59,14 +59,14 @@ public class CycloidConnectActivity extends Activity {
                             String arduinoMsg = sb.substring(0, endOfLineIndex);
                             sb.delete(0, sb.length());
                             CyclopusStatus cs = CyclopusMsg.parseMessage(arduinoMsg);
-
+                            if (cs == null) return;
                             lblStatus.setText(arduinoMsg);
 
                             lblSpeed.setEnabled(true);
                             lblCadence.setEnabled(true);
 
-                            lblSpeed.setText(String.format("{0} Km/H", cs.getSpeed()));
-                            lblCadence.setText(String.format("Cadence: {0} RPMs", cs.getCadence()));
+                            lblSpeed.setText(String.format("%s Km/H", cs.getSpeed()));
+                            lblCadence.setText(String.format("Cadence: %s RPMs", cs.getCadence()));
                             if (cs.getCadence() < 60) lblCadence.setBackgroundColor(Color.RED);
                             else lblCadence.setBackgroundColor(Color.GREEN);
                         }
@@ -89,6 +89,7 @@ public class CycloidConnectActivity extends Activity {
 
         // Set up a pointer to the remote node using it's address.
         BluetoothDevice device = btAdapter.getRemoteDevice(address);
+
 
         // Two things are needed to make a connection:
         //   A MAC address, which we got above.
@@ -128,7 +129,7 @@ public class CycloidConnectActivity extends Activity {
     public void onPause() {
         super.onPause();
 
-        Log.d(TAG, "...In onPause()...");
+        Log.d(TAG, "In onPause()...");
 
         try {
             btSocket.close();
