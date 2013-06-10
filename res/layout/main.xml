@@ -7,7 +7,12 @@
     <TextView
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
-            android:text="Hello World, CycloidConnectActivity"
+            android:text="Please, push connect when Cyclopus module is ready to connect"
             />
+    <Button
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:text="Connect"
+            android:id="@+id/button" android:singleLine="true"/>
 </LinearLayout>
 
