@@ -27,11 +27,11 @@ public class CyclopusStatus {
         return cadence;
     }
 
-    public long getOdometer() {
-        return odometer;
+    public float getOdometer() {
+        return odometer/100;
     }
 
-    public long getDistance() {
-        return distance;
+    public float getTotalDistance() {
+        return distance/100;
     }
 }

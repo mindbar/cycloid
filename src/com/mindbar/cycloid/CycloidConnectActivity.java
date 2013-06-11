@@ -9,6 +9,7 @@ import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Handler;
 import android.util.Log;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 import com.mindbar.cycloid.helpers.CyclopusMsg;
@@ -27,7 +28,8 @@ public class CycloidConnectActivity extends Activity {
     // MAC-address of Arduino Bluetooth module
     private static String address = "20:13:02:25:10:89";
     final int RECIEVE_MESSAGE = 1;        // Статус для Handler
-    TextView lblSpeed, lblCadence, lblStatus;
+    TextView txtSpeed, txtCadence, txtStatus, txtOdo, txtDist;
+    LinearLayout layoutCadence;
     Handler h;
     private BluetoothAdapter btAdapter = null;
     private BluetoothSocket btSocket = null;
@@ -43,10 +45,12 @@ public class CycloidConnectActivity extends Activity {
 
         setContentView(R.layout.main);
 
-        lblSpeed = (TextView) findViewById(R.id.lblSpeed);
-        lblCadence = (TextView) findViewById(R.id.lblCadence);
-        lblStatus = (TextView) findViewById(R.id.lblConnectionStatus);
-
+        txtSpeed = (TextView) findViewById(R.id.txtSpeed);
+        txtCadence = (TextView) findViewById(R.id.txtCadence);
+        txtStatus = (TextView) findViewById(R.id.txtStatus);
+        txtOdo = (TextView) findViewById(R.id.txtOdometer);
+        txtDist = (TextView) findViewById(R.id.txtDistance);
+        layoutCadence = (LinearLayout) findViewById(R.id.layoutCadence);
         h = new Handler() {
             public void handleMessage(android.os.Message msg) {
                 switch (msg.what) {
@@ -60,21 +64,22 @@ public class CycloidConnectActivity extends Activity {
                             sb.delete(0, sb.length());
                             CyclopusStatus cs = CyclopusMsg.parseMessage(arduinoMsg);
                             if (cs == null) return;
-                            lblStatus.setText(arduinoMsg);
+                            txtStatus.setText(arduinoMsg);
 
-                            lblSpeed.setEnabled(true);
-                            lblCadence.setEnabled(true);
+                            txtSpeed.setText(Float.toString(cs.getSpeed()));
+                            txtCadence.setText(cs.getCadence());
 
-                            lblSpeed.setText(String.format("%s Km/H", cs.getSpeed()));
-                            lblCadence.setText(String.format("Cadence: %s RPMs", cs.getCadence()));
-                            if (cs.getCadence() < 60) lblCadence.setBackgroundColor(Color.RED);
-                            else lblCadence.setBackgroundColor(Color.GREEN);
+                            txtOdo.setText(Float.toString(cs.getOdometer()));
+                            txtDist.setText(Float.toString(cs.getTotalDistance()));
+
+                            if (cs.getCadence() < 60) layoutCadence.setBackgroundColor(Color.RED);
+                            else layoutCadence.setBackgroundColor(Color.GREEN);
                         }
                         break;
                 }
             }
 
-            ;
+
         };
 
         btAdapter = BluetoothAdapter.getDefaultAdapter();       // local Bluetooth adapter
@@ -148,7 +153,7 @@ public class CycloidConnectActivity extends Activity {
                 Log.d(TAG, ".Bluetooth ON");
             } else {
                 //Prompt user to turn on Bluetooth
-                Intent enableBtIntent = new Intent(btAdapter.ACTION_REQUEST_ENABLE);
+                Intent enableBtIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
                 startActivityForResult(enableBtIntent, REQUEST_ENABLE_BT);
             }
         }
@@ -174,7 +179,7 @@ public class CycloidConnectActivity extends Activity {
             try {
                 tmpIn = socket.getInputStream();
                 tmpOut = socket.getOutputStream();
-            } catch (IOException e) {
+            } catch (IOException ignored) {
             }
 
             mmInStream = tmpIn;
@@ -212,7 +217,7 @@ public class CycloidConnectActivity extends Activity {
         public void cancel() {
             try {
                 mmSocket.close();
-            } catch (IOException e) {
+            } catch (IOException ignored) {
             }
         }
     }
