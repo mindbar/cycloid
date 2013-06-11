@@ -11,7 +11,7 @@
             android:id="@+id/lblConnectionStatus" android:textColor="@android:color/black" android:paddingBottom="25dp"/>
     <LinearLayout
             android:orientation="horizontal"
-            android:layout_width="wrap_content"
+            android:layout_width="fill_parent"
             android:layout_height="wrap_content" android:baselineAligned="false" android:layout_gravity="center|left"
             android:paddingLeft="20dp">
         <TextView
@@ -19,13 +19,13 @@
                 android:layout_height="wrap_content"
                 android:text="99.99"
                 android:id="@+id/lblSpeed" android:layout_gravity="center" android:textColor="@android:color/black"
-                android:textSize="95dp" android:textStyle="bold" android:singleLine="true"/>
+                android:textSize="95dp" android:textStyle="bold" android:singleLine="true" android:layout_weight="1"/>
         <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Km/h"
                 android:id="@+id/textView" android:layout_gravity="center_horizontal|bottom"
-                android:textColor="@android:color/black" android:textSize="20dp" android:singleLine="true"
+                android:textColor="@android:color/black" android:singleLine="true"
                 android:layout_marginBottom="15dp" android:layout_marginRight="10dp"/>
     </LinearLayout>
     <LinearLayout
@@ -46,7 +46,7 @@
                 android:layout_height="wrap_content"
                 android:text="RPMs"
                 android:id="@+id/textView2" android:textColor="@android:color/black" android:layout_gravity="bottom|right"
-                android:layout_marginBottom="5dp"/>
+                android:layout_marginBottom="5dp" android:layout_marginRight="10dp"/>
     </LinearLayout>
     <LinearLayout android:orientation="horizontal" android:layout_width="fill_parent"
                   android:layout_height="wrap_content" android:layout_gravity="center|left" android:paddingLeft="20dp"
