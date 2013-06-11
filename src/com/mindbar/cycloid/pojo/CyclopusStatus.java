@@ -20,7 +20,7 @@ public class CyclopusStatus {
     }
 
     public float getSpeed() {
-        return speed;
+        return speed/100;
     }
 
     public int getCadence() {
@@ -28,10 +28,10 @@ public class CyclopusStatus {
     }
 
     public float getOdometer() {
-        return odometer/100;
+        return odometer / 100 / 100.0f; // cm to km (18294 cm -> 1.82 km)
     }
 
     public float getTotalDistance() {
-        return distance/100;
+        return distance / 100 / 100.0f; // cm to km
     }
 }

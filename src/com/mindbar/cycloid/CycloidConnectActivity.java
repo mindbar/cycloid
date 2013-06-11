@@ -15,9 +15,7 @@ import android.widget.Toast;
 import com.mindbar.cycloid.helpers.CyclopusMsg;
 import com.mindbar.cycloid.pojo.CyclopusStatus;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
+import java.io.*;
 import java.util.UUID;
 
 public class CycloidConnectActivity extends Activity {
@@ -33,6 +31,7 @@ public class CycloidConnectActivity extends Activity {
     Handler h;
     private BluetoothAdapter btAdapter = null;
     private BluetoothSocket btSocket = null;
+    private BufferedReader mBufferedReader = null;
     private StringBuilder sb = new StringBuilder();
     private ConnectedThread mConnectedThread;
 
@@ -55,26 +54,22 @@ public class CycloidConnectActivity extends Activity {
             public void handleMessage(android.os.Message msg) {
                 switch (msg.what) {
                     case RECIEVE_MESSAGE:
-                        byte[] readBuf = (byte[]) msg.obj;
-                        String strIncom = new String(readBuf, 0, msg.arg1);
-                        sb.append(strIncom);
-                        int endOfLineIndex = sb.indexOf("\r\n");
-                        if (endOfLineIndex > 0) {
-                            String arduinoMsg = sb.substring(0, endOfLineIndex);
-                            sb.delete(0, sb.length());
-                            CyclopusStatus cs = CyclopusMsg.parseMessage(arduinoMsg);
-                            if (cs == null) return;
-                            txtStatus.setText(arduinoMsg);
+                        String arduinoMsg = (String) msg.obj;
+                        sb.delete(0, sb.length());
+                        Log.d(TAG, arduinoMsg);
+                        CyclopusStatus cs = CyclopusMsg.parseMessage(arduinoMsg);
+                        if (cs == null) return;
+                        txtStatus.setText(arduinoMsg);
 
-                            txtSpeed.setText(Float.toString(cs.getSpeed()));
-                            txtCadence.setText(cs.getCadence());
+                        txtSpeed.setText(Float.toString(cs.getSpeed()));
+                        txtCadence.setText(Integer.toString(cs.getCadence()));
 
-                            txtOdo.setText(Float.toString(cs.getOdometer()));
-                            txtDist.setText(Float.toString(cs.getTotalDistance()));
+                        txtOdo.setText(Float.toString(cs.getOdometer()));
+                        txtDist.setText(Float.toString(cs.getTotalDistance()));
 
-                            if (cs.getCadence() < 60) layoutCadence.setBackgroundColor(Color.RED);
-                            else layoutCadence.setBackgroundColor(Color.GREEN);
-                        }
+                        if (cs.getCadence() < 60) layoutCadence.setBackgroundColor(Color.RED);
+                        else layoutCadence.setBackgroundColor(Color.GREEN);
+
                         break;
                 }
             }
@@ -150,7 +145,7 @@ public class CycloidConnectActivity extends Activity {
             errorExit("Fatal Error", "Bluetooth not supported");
         } else {
             if (btAdapter.isEnabled()) {
-                Log.d(TAG, ".Bluetooth ON");
+                Log.d(TAG, "Bluetooth ON");
             } else {
                 //Prompt user to turn on Bluetooth
                 Intent enableBtIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
@@ -168,17 +163,20 @@ public class CycloidConnectActivity extends Activity {
         private final BluetoothSocket mmSocket;
         private final InputStream mmInStream;
         private final OutputStream mmOutStream;
+        private BufferedReader br = null;
 
         public ConnectedThread(BluetoothSocket socket) {
             mmSocket = socket;
             InputStream tmpIn = null;
             OutputStream tmpOut = null;
 
+
             // Get the input and output streams, using temp objects because
             // member streams are final
             try {
                 tmpIn = socket.getInputStream();
                 tmpOut = socket.getOutputStream();
+                br = new BufferedReader(new InputStreamReader(tmpIn));
             } catch (IOException ignored) {
             }
 
@@ -194,8 +192,10 @@ public class CycloidConnectActivity extends Activity {
             while (true) {
                 try {
                     // Read from the InputStream
-                    bytes = mmInStream.read(buffer);
-                    h.obtainMessage(RECIEVE_MESSAGE, bytes, -1, buffer).sendToTarget();
+                    if (br.ready()) {
+
+                        h.obtainMessage(RECIEVE_MESSAGE, br.readLine()).sendToTarget();
+                    }
                 } catch (IOException e) {
                     break;
                 }
