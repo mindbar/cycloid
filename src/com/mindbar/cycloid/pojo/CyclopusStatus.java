@@ -7,20 +7,26 @@ package com.mindbar.cycloid.pojo;
  * Time: 14:55
  */
 public class CyclopusStatus {
-    private float speed = 0.0F;
+    private long speed = 0;
+    private long speedMax = 0;
     private int cadence = 0;
     private long odometer = 0;
     private long distance = 0;
 
-    public CyclopusStatus(int cadence, float speed, long odometer, long distance){
+    public CyclopusStatus(int cadence, long speed, long speedMax, long odometer, long distance){
         this.speed = speed;
+        this.speedMax = speedMax;
         this.cadence = cadence;
         this.odometer = odometer;
         this.distance = distance;
     }
 
     public float getSpeed() {
-        return speed/100;
+        return speed / 100.0f;
+    }
+
+    public float getMaxSpeed() {
+        return speedMax / 100.0f;
     }
 
     public int getCadence() {

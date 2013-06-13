@@ -9,6 +9,7 @@ import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Handler;
 import android.util.Log;
+import android.view.WindowManager;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -26,7 +27,7 @@ public class CycloidConnectActivity extends Activity {
     // MAC-address of Arduino Bluetooth module
     private static String address = "20:13:02:25:10:89";
     final int RECIEVE_MESSAGE = 1;        // Статус для Handler
-    TextView txtSpeed, txtCadence, txtStatus, txtOdo, txtDist;
+    TextView txtSpeed, txtCadence, txtStatus, txtOdo, txtDist, txtMaxSpeed;
     LinearLayout layoutCadence;
     Handler h;
     private BluetoothAdapter btAdapter = null;
@@ -45,6 +46,7 @@ public class CycloidConnectActivity extends Activity {
         setContentView(R.layout.main);
 
         txtSpeed = (TextView) findViewById(R.id.txtSpeed);
+        txtMaxSpeed = (TextView) findViewById(R.id.txtMaxSpeed);
         txtCadence = (TextView) findViewById(R.id.txtCadence);
         txtStatus = (TextView) findViewById(R.id.txtStatus);
         txtOdo = (TextView) findViewById(R.id.txtOdometer);
@@ -56,12 +58,13 @@ public class CycloidConnectActivity extends Activity {
                     case RECIEVE_MESSAGE:
                         String arduinoMsg = (String) msg.obj;
                         sb.delete(0, sb.length());
-                        Log.d(TAG, arduinoMsg);
+                        Log.i(TAG, arduinoMsg);
                         CyclopusStatus cs = CyclopusMsg.parseMessage(arduinoMsg);
                         if (cs == null) return;
                         txtStatus.setText(arduinoMsg);
 
                         txtSpeed.setText(Float.toString(cs.getSpeed()));
+                        txtMaxSpeed.setText(Float.toString(cs.getMaxSpeed()));
                         txtCadence.setText(Integer.toString(cs.getCadence()));
 
                         txtOdo.setText(Float.toString(cs.getOdometer()));
@@ -87,6 +90,8 @@ public class CycloidConnectActivity extends Activity {
 
         Log.d(TAG, "onResume - Reconnect");
 
+        // wakelock
+        getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
         // Set up a pointer to the remote node using it's address.
         BluetoothDevice device = btAdapter.getRemoteDevice(address);
 
@@ -193,12 +198,15 @@ public class CycloidConnectActivity extends Activity {
                 try {
                     // Read from the InputStream
                     if (br.ready()) {
-
                         h.obtainMessage(RECIEVE_MESSAGE, br.readLine()).sendToTarget();
                     }
+                    Thread.sleep(100);
                 } catch (IOException e) {
                     break;
+                } catch (InterruptedException e) {
+                    e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
                 }
+
             }
         }
 

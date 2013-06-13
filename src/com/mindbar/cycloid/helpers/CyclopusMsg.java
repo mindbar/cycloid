@@ -12,10 +12,10 @@ public class CyclopusMsg {
 
     public static CyclopusStatus parseMessage(String input) {
         try {
-            // format message from Arduino firmware: intCadence,floatSpeed,longOdometer,longDistance
+            // format message from Arduino firmware: intCadence,lSpeed, lSpeedMax, longOdometer,longDistance
 
             String[] values = input.split(",");
-            CyclopusStatus cs = new CyclopusStatus(Integer.parseInt(values[0]), Float.parseFloat(values[1]), Long.parseLong(values[2]), Long.parseLong(values[3]));
+            CyclopusStatus cs = new CyclopusStatus(Integer.parseInt(values[0]), Long.parseLong(values[1]), Long.parseLong(values[2]), Long.parseLong(values[3]), Long.parseLong(values[4]));
             return cs;
         } catch (Exception e) {
             return null;
